@@ -2,11 +2,6 @@ package sudark.rentland;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import sudark.courier.OneBotWebsocket;
-
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 public final class RentLand extends JavaPlugin {
 

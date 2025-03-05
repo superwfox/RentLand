@@ -6,8 +6,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static sudark.rentland.LandNotice.ask;
 
 public class PlayerMoveDetector {
 
@@ -21,14 +24,18 @@ public class PlayerMoveDetector {
 
                     if (locations.get(pl) == pl.getLocation()) return;
 
-                    detected(pl);
+                    try {
+                        detected(pl);
+                    } catch (URISyntaxException e) {
+                        throw new RuntimeException(e);
+                    }
                     locations.put(pl, pl.getLocation());
                 }
             }
         }.runTaskTimer(Bukkit.getPluginManager().getPlugin("RentLand"), 0, 10L);
     }
 
-    public static void detected(Player pl) {
+    public static void detected(Player pl) throws URISyntaxException {
 
         List<List<String>> data = FileManager.readCSV(FileManager.landFile);
         for (List<String> row : data) {
@@ -38,14 +45,20 @@ public class PlayerMoveDetector {
             int Y = Integer.parseInt(row.get(5));
 
             if (pl.getLocation().getBlockX() >= x && pl.getLocation().getBlockX() <= X && pl.getLocation().getBlockZ() >= y && pl.getLocation().getBlockZ() <= Y) {
+
                 if (row.subList(6, row.size()).contains(pl.getUniqueId().toString())) {
                     pl.removeMetadata("invader", Bukkit.getPluginManager().getPlugin("RentLand"));
                     return;
                 }
-                pl.setMetadata("invader", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), true));
+
+                if (pl.hasMetadata("invader")) return;
+
+                String LandID = x + X + y + Y + "";
+                pl.setMetadata("invader", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), row.get(6) + "|" + row.get(1) + "|" + LandID));
+                ask(pl);
+
                 return;
             }
-
         }
 
         pl.removeMetadata("invader", Bukkit.getPluginManager().getPlugin("RentLand"));

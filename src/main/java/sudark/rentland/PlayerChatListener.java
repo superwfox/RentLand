@@ -8,8 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
-import sudark.courier.OneBotWebsocket;
+import org.bukkit.metadata.FixedMetadataValue;;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -18,7 +17,7 @@ import java.util.List;
 
 public class PlayerChatListener implements Listener {
     @EventHandler
-    public void onPlayerChat(AsyncPlayerChatEvent e) {
+    public void onPlayerChat(AsyncPlayerChatEvent e) throws URISyntaxException {
         Player pl = e.getPlayer();
 
         if (!pl.hasMetadata("RentLand")) return;
@@ -33,13 +32,9 @@ public class PlayerChatListener implements Listener {
                         "==============\n" +
                         "[" + pl.getMetadata("RentLand").get(1).asString() + "]";
 
-                OneBotWebsocket ws;
-                try {
-                    ws = new OneBotWebsocket(new URI("ws://localhost:3001"));
-                } catch (URISyntaxException ex) {
-                    throw new RuntimeException(ex);
-                }
+                OneBotClient ws = new OneBotClient(new URI("ws://localhost:3001"));
                 ws.sendG(msg);
+                ws.at(DataSniffer.findQQ(pl.getUniqueId().toString()));
             }
         }
 

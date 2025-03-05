@@ -59,9 +59,7 @@ public class PurChaseListener implements Listener {
         if (checkPosition(loc1, loc2, pl)) {
 
             showParticle(loc1, loc2, pl);
-
             calculate(loc1, loc2, pl);
-
             Bukkit.getPluginManager().registerEvents(new PlayerChatListener(), Bukkit.getPluginManager().getPlugin("RentLand"));
 
         }
