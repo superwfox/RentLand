@@ -15,6 +15,8 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.List;
 
+import static sudark.rentland.PurChaseListener.Tloc;
+
 public class PlayerChatListener implements Listener {
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent e) throws URISyntaxException {
@@ -22,15 +24,19 @@ public class PlayerChatListener implements Listener {
 
         if (!pl.hasMetadata("RentLand")) return;
 
-        if (pl.getMetadata("RentLand").size() == 2) {
+
+        if (pl.getMetadata("RentLand").size() == 3) {
+            String[] strs = pl.getMetadata("RentLand").get(0).asString().split("//|");
+            String date = pl.getMetadata("RentLand").get(1).asString();
+            String time = pl.getMetadata("RentLand").get(2).asString();
             if (e.getMessage().equals("票据")) {
                 String msg = "RENTLAND:\n" +
                         "==============\n" +
                         "地主：" + pl.getName() + "\n" +
-                        "面积：" + ((int[]) (pl.getMetadata("RentLand").get(0).value()))[0] + "\n" +
-                        "租期：" + ((int[]) (pl.getMetadata("RentLand").get(0).value()))[1] + "周\n" +
+                        "面积：" + strs[0] + "\n" +
+                        "租期：" + time + "周\n" +
                         "==============\n" +
-                        "[" + pl.getMetadata("RentLand").get(1).asString() + "]";
+                        "[" + date + "]";
 
                 OneBotClient ws = new OneBotClient(new URI("ws://localhost:3001"));
                 ws.sendG(msg);
@@ -44,36 +50,34 @@ public class PlayerChatListener implements Listener {
         } catch (NumberFormatException ex) {
             pl.sendMessage("非阿拉伯数字 已取消");
             pl.sendMessage("=================");
-            pl.sendMessage("已保存圈地信息 用书本点击可继续");
+            pl.sendMessage("你现在可以重新圈地了");
+            Tloc.remove(pl);
             pl.removeMetadata("RentLand", Bukkit.getPluginManager().getPlugin("RentLand"));
         }
 
         if (weeks < 1) {
-            pl.sendMessage("?");
+            pl.sendMessage("[§e领地§f] ? 数字不合法");
             return;
         }
 
-        int[] valves = (int[]) pl.getMetadata("RentLand").get(0).value();
-        int area = valves[0];
-        int x1 = valves[1];
-        int z1 = valves[2];
-        int X1 = valves[3];
-        int Z1 = valves[4];
+        String[] strs = pl.getMetadata("RentLand").get(0).asString().split("//|");
+
+        int area = Integer.parseInt(strs[0]);
+        int x1 = Integer.parseInt(strs[1]);
+        int X1 = Integer.parseInt(strs[2]);
+        int z1 = Integer.parseInt(strs[3]);
+        int Z1 = Integer.parseInt(strs[4]);
 
         int level = pl.getLevel();
 
         if (area / 100 * weeks > level) {
-            pl.sendMessage("等级不足以支付 已取消");
-            pl.sendMessage("=================");
-            pl.sendMessage("已保存圈地信息 用书本点击可继续");
+            pl.sendMessage("[§e领地§f] 等级不足以支付 请重试");
             return;
         }
 
         pl.setLevel(level - area / 100 * weeks);
-        pl.sendMessage("");
         success(pl, area, weeks);
 
-        pl.setMetadata("RentLand", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), new int[]{area, weeks}));
         List<List<String>> data = FileManager.readCSV(FileManager.landFile);
         data.add(List.of(weeks * 7 + "", "null", "" + x1, "" + X1, "" + z1, "" + Z1, pl.getUniqueId().toString()));
         FileManager.writeCSV(FileManager.landFile, data);
@@ -89,8 +93,10 @@ public class PlayerChatListener implements Listener {
         int year = date.getYear();
         int month = date.getMonthValue();
         int day = date.getDayOfMonth();
-        String t = "" + year + "/" + month + "/" + day;
+        String t = year + "/" + month + "/" + day;
+
         pl.getMetadata("RentLand").add(new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), t));
+        pl.getMetadata("RentLand").add(new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), time));
 
         pl.sendMessage("§e§l" + pl.getName() + " §r§f同志，您于§b" + t + "§f租赁土地§e " + area + " §f格，租期§e " + time * 7 + " §f天");
         pl.sendMessage("§7需要在群内发送票据，请在游戏聊天发送“票据”");

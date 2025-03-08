@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PurChaseListener implements Listener {
 
-    ConcurrentHashMap<Player, Pair<Location, Location>> Tloc = new ConcurrentHashMap<>();
+    static ConcurrentHashMap<Player, Pair<Location, Location>> Tloc = new ConcurrentHashMap<>();
     static BukkitTask showLand;
     static BukkitTask showLand2;
 
@@ -86,7 +86,7 @@ public class PurChaseListener implements Listener {
         pl.sendMessage("当前最多可购买§b" + pl.getLevel() / (area / 100) + "§f周");
         pl.sendMessage("§7 ( 发送阿拉伯数字，其他字符来取消 )");
 
-        pl.setMetadata("RentLand", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), new int[]{area, x1, z1, X1, Z1}));
+        pl.setMetadata("RentLand", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), area + "|" + x1 + "|" + X1 + "|" + z1 + "|" + Z1));
     }
 
     public static void showParticle(Location loc1, Location loc2, Player pl) {
@@ -128,6 +128,7 @@ public class PurChaseListener implements Listener {
         }.runTaskTimer(Bukkit.getPluginManager().getPlugin("RentLand"), 0, 1);
 
         showLand2 = new BukkitRunnable() {
+
             @Override
             public void run() {
                 for (int x = x1; x <= X1; x++) {
