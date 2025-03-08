@@ -63,7 +63,7 @@ public class BookController implements Listener {
                             int dx = x1 - x, dz = z1 - z;
                             int area = dx * dz;
 
-                            int deltaT = t - Integer.parseInt(time);
+                            int deltaT = (t - Integer.parseInt(time)) * area / 700;
                             int lvl = pl.getLevel();
                             if (deltaT > lvl) {
                                 pl.sendMessage("[§e领地§f] 等级不足，无法修改租赁时间");
