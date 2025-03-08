@@ -100,11 +100,9 @@ public class LandNotice implements Listener {
             for (List<String> row : data) {
 
                 int x = Integer.parseInt(row.get(2));
-                int X = Integer.parseInt(row.get(3));
                 int y = Integer.parseInt(row.get(4));
-                int Y = Integer.parseInt(row.get(5));
 
-                String LandID = x + X + y + Y + "";
+                String LandID = x + y + "";
 
                 if (LandID.equals(landID)) {
 

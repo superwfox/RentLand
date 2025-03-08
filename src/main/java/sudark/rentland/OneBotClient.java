@@ -95,11 +95,9 @@ public class OneBotClient extends WebSocketClient {
                         List<List<String>> data = FileManager.readCSV(sudark.rentland.FileManager.landFile);
                         for (List<String> row : data) {
                             int x = Integer.parseInt(row.get(2));
-                            int X = Integer.parseInt(row.get(3));
                             int y = Integer.parseInt(row.get(4));
-                            int Y = Integer.parseInt(row.get(5));
 
-                            String LandID = x + X + y + Y + "";
+                            String LandID = x + y + "";
                             String landID = landIDs.get(index);
 
                             if (LandID.equals(landID)) {
