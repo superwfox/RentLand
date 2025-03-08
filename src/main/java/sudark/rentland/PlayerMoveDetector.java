@@ -54,7 +54,7 @@ public class PlayerMoveDetector {
                 if (pl.hasMetadata("invader")) return;
 
                 String LandID = x  + y + "";
-                pl.setMetadata("invader", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), row.get(6) + "|" + row.get(1) + "|" + LandID));
+                pl.setMetadata("invader", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), row.get(6) + "," + row.get(1) + "," + LandID));
                 ask(pl);
 
                 return;

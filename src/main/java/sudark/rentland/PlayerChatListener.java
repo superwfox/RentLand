@@ -60,7 +60,7 @@ public class PlayerChatListener implements Listener {
             return;
         }
 
-        String[] strs = pl.getMetadata("RentLand").get(0).asString().split("//|");
+        String[] strs = pl.getMetadata("RentLand").get(0).asString().split(",");
 
         int area = Integer.parseInt(strs[0]);
         int x1 = Integer.parseInt(strs[1]);

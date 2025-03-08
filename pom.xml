@@ -68,11 +68,16 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>Sudark</groupId>
-            <artifactId>Courier</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>C:\Users\Sudark\IdeaProjects\Courier\target\Courier-1.0-SNAPSHOT.jar</systemPath>
+            <groupId>org.java-websocket</groupId>
+            <artifactId>Java-WebSocket</artifactId>
+            <version>1.5.7</version>
+        </dependency>
+        <!--json-lib-->
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.4</version>
+            <classifier>jdk15</classifier>
         </dependency>
     </dependencies>
 </project>

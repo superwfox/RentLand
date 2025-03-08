@@ -26,7 +26,9 @@ public class PurChaseListener implements Listener {
         if (!(pl.getItemInHand().getType() == Material.WRITABLE_BOOK && e.getAction().equals(Action.LEFT_CLICK_BLOCK)))
             return;
 
-        if (!Tloc.contains(pl)) {
+        System.out.println("Purchase");
+
+        if (!Tloc.containsKey(pl)) {
             Tloc.put(pl, Pair.of(null, null));
 
             pl.sendTitle("[§e圈定模式§f]", "§7点击方块来确定领地对角");
@@ -36,7 +38,7 @@ public class PurChaseListener implements Listener {
         }
 
 
-        if (Tloc.contains(pl) && Tloc.get(pl).left() == null) {
+        if (Tloc.containsKey(pl) && Tloc.get(pl).left() == null) {
             Tloc.put(pl, Pair.of(e.getClickedBlock().getLocation(), null));
 
             pl.sendTitle("[§e圈定模式§f]", "§7还需要确认一个角落");
@@ -45,7 +47,7 @@ public class PurChaseListener implements Listener {
             return;
         }
 
-        if (Tloc.contains(pl) && Tloc.get(pl).right() == null) {
+        if (Tloc.containsKey(pl) && Tloc.get(pl).right() == null) {
             Tloc.put(pl, Pair.of(Tloc.get(pl).left(), e.getClickedBlock().getLocation()));
 
             pl.sendTitle("[§e圈定模式§f]", "§7圈定完成，请等待计算结果");
@@ -58,6 +60,11 @@ public class PurChaseListener implements Listener {
 
         if (checkPosition(loc1, loc2, pl)) {
 
+            if (pl.getLevel() == 0) {
+                pl.sendMessage("[§e领地§f] 等级不足以支付 已为您保存领地，稍后书本点击可继续支付");
+                return;
+            }
+
             showParticle(loc1, loc2, pl);
             calculate(loc1, loc2, pl);
             Bukkit.getPluginManager().registerEvents(new PlayerChatListener(), Bukkit.getPluginManager().getPlugin("RentLand"));
@@ -68,6 +75,7 @@ public class PurChaseListener implements Listener {
     }
 
     public void calculate(Location loc1, Location loc2, Player pl) {
+
         int x1 = Math.min(loc1.getBlockX(), loc2.getBlockX());
         int z1 = Math.min(loc1.getBlockZ(), loc2.getBlockZ());
         int X1 = Math.max(loc1.getBlockX(), loc2.getBlockX());
@@ -86,7 +94,7 @@ public class PurChaseListener implements Listener {
         pl.sendMessage("当前最多可购买§b" + pl.getLevel() / (area / 100) + "§f周");
         pl.sendMessage("§7 ( 发送阿拉伯数字，其他字符来取消 )");
 
-        pl.setMetadata("RentLand", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), area + "|" + x1 + "|" + X1 + "|" + z1 + "|" + Z1));
+        pl.setMetadata("RentLand", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), area + "," + x1 + "," + X1 + "," + z1 + "," + Z1));
     }
 
     public static void showParticle(Location loc1, Location loc2, Player pl) {
@@ -105,9 +113,9 @@ public class PurChaseListener implements Listener {
 
             @Override
             public void run() {
-                Location loc = new Location(pl.getWorld(), x, pl.getWorld().getHighestBlockYAt(x, z), z);
+                Location loc = new Location(pl.getWorld(), x, pl.getWorld().getHighestBlockYAt(x, z) + 2, z);
                 pl.getWorld().spawnParticle(Particle.SONIC_BOOM, loc, 2, 0, 0, 0, 0);
-                Location locT = new Location(pl.getWorld(), x2, pl.getWorld().getHighestBlockYAt(x2, z2), z2);
+                Location locT = new Location(pl.getWorld(), x2, pl.getWorld().getHighestBlockYAt(x2, z2) + 2, z2);
                 pl.getWorld().spawnParticle(Particle.SONIC_BOOM, locT, 2, 0, 0, 0, 0);
 
                 if (x < X1) x++;
@@ -132,14 +140,14 @@ public class PurChaseListener implements Listener {
             @Override
             public void run() {
                 for (int x = x1; x <= X1; x++) {
-                    Location loc = new Location(pl.getWorld(), x, pl.getWorld().getHighestBlockYAt(x, z1), z1);
-                    Location locT = new Location(pl.getWorld(), x, pl.getWorld().getHighestBlockYAt(x, Z1), Z1);
+                    Location loc = new Location(pl.getWorld(), x, pl.getWorld().getHighestBlockYAt(x, z1) + 1, z1);
+                    Location locT = new Location(pl.getWorld(), x, pl.getWorld().getHighestBlockYAt(x, Z1) + 1, Z1);
                     pl.getWorld().spawnParticle(Particle.END_ROD, loc, 1, 0, 0, 0, 0);
                     pl.getWorld().spawnParticle(Particle.END_ROD, locT, 1, 0, 0, 0, 0);
                 }
                 for (int z = z1; z <= Z1; z++) {
-                    Location loc = new Location(pl.getWorld(), x1, pl.getWorld().getHighestBlockYAt(x1, z), z);
-                    Location locT = new Location(pl.getWorld(), X1, pl.getWorld().getHighestBlockYAt(X1, z), z);
+                    Location loc = new Location(pl.getWorld(), x1, pl.getWorld().getHighestBlockYAt(x1, z) + 1, z);
+                    Location locT = new Location(pl.getWorld(), X1, pl.getWorld().getHighestBlockYAt(X1, z) + 1, z);
                     pl.getWorld().spawnParticle(Particle.END_ROD, loc, 1, 0, 0, 0, 0);
                     pl.getWorld().spawnParticle(Particle.END_ROD, locT, 1, 0, 0, 0, 0);
                 }
@@ -150,21 +158,21 @@ public class PurChaseListener implements Listener {
 
     public boolean checkPosition(Location loc1, Location loc2, Player pl) {
         List<List<String>> data = FileManager.readCSV(FileManager.landFile);
+        int x1 = Math.min(loc1.getBlockX(), loc2.getBlockX());
+        int z1 = Math.min(loc1.getBlockZ(), loc2.getBlockZ());
+        int X1 = Math.max(loc1.getBlockX(), loc2.getBlockX());
+        int Z1 = Math.max(loc1.getBlockZ(), loc2.getBlockZ());
+
+        if ((X1 - x1) * (Z1 - z1) < 9) {
+            pl.sendTitle("[§e圈地失败§f]", "§7圈地面积过小");
+            return false;
+        }
+
         for (List<String> row : data) {
             int x = Integer.parseInt(row.get(2));
             int X = Integer.parseInt(row.get(3));
             int z = Integer.parseInt(row.get(4));
             int Z = Integer.parseInt(row.get(5));
-
-            int x1 = Math.min(loc1.getBlockX(), loc2.getBlockX());
-            int z1 = Math.min(loc1.getBlockZ(), loc2.getBlockZ());
-            int X1 = Math.max(loc1.getBlockX(), loc2.getBlockX());
-            int Z1 = Math.max(loc1.getBlockZ(), loc2.getBlockZ());
-
-            if ((X1 - x1) * (Z1 - z1) < 9) {
-                pl.sendTitle("[§e圈地失败§f]", "§7圈地面积过小");
-                return false;
-            }
 
             if (!(X < x1 || X1 < x || Z < z1 || Z1 < z)) {
                 Tloc.remove(pl);

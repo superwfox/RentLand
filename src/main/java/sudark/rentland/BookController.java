@@ -12,7 +12,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,7 +32,6 @@ public class BookController implements Listener {
                 whole += s;
             }
 
-            List<List<String>> landata = new ArrayList<>();
             String[] lands = whole.split("§l·土地详情\\|");
             for (String land : lands) {
                 String name = findLandName(land);

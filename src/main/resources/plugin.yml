@@ -2,4 +2,3 @@ name: RentLand
 version: '${project.version}'
 main: sudark.rentland.RentLand
 api-version: '1.21'
-depend: [Courier]

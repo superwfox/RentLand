@@ -33,7 +33,7 @@ public class LandNotice implements Listener {
             Player p = Bukkit.getPlayer(ownerUuid);
 
             p.sendMessage("  [§e领地§f] §7" + pl.getName() + "正在" + name + "闲逛，是否给予权限\n   .回答“§b是§7”确认，否则请忽略此消息");
-            p.setMetadata("RightManage", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), pl.getUniqueId() + "|" + landID));
+            p.setMetadata("RightManage", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), pl.getUniqueId() + "," + landID));
 
             task = new BukkitRunnable() {
                 @Override
@@ -72,7 +72,7 @@ public class LandNotice implements Listener {
 
             e.setCancelled(true);
             pl.sendMessage("[§e领地§f] 请等待地主回复");
-            String[] invader = pl.getMetadata("invader").get(0).asString().split("\\|");
+            String[] invader = pl.getMetadata("invader").get(0).asString().split(",");
             ask2(invader[0], pl, invader[1]);
             qqs.add(DataSniffer.findQQ(invader[0]));
             uuids.add(pl.getUniqueId().toString());
@@ -92,7 +92,7 @@ public class LandNotice implements Listener {
         if (pl.hasMetadata("RightManage") && e.getMessage().equals("是")) {
             e.setCancelled(true);
 
-            String[] strs = pl.getMetadata("RightManager").get(0).asString().split("//|");
+            String[] strs = pl.getMetadata("RightManager").get(0).asString().split(",");
             String uuid = strs[0];
             String landID = strs[1];
             List<List<String>> data = FileManager.readCSV(sudark.rentland.FileManager.landFile);

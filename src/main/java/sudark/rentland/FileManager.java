@@ -8,7 +8,7 @@ import java.util.List;
 
 public class FileManager {
 
-    static File  landFolder = Bukkit.getPluginsFolder();
+    static File  landFolder = Bukkit.getPluginManager().getPlugin("RentLand").getDataFolder();
     static File landFile = new File(landFolder,"land.csv");
 
     public static void checkFile(File fileFolder,File file) {

@@ -42,7 +42,7 @@ public class DataSniffer {
                 return row.get(0);
             }
         }
-
+        return null;
     }
 
 }
