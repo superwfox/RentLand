@@ -166,6 +166,7 @@ public class PurChaseListener implements Listener {
         int Z1 = Math.max(loc1.getBlockZ(), loc2.getBlockZ());
 
         if ((X1 - x1) * (Z1 - z1) < 9) {
+            Tloc.remove(pl);
             pl.sendTitle("[§e圈地失败§f]", "§7圈地面积过小");
             return false;
         }
