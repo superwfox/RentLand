@@ -65,6 +65,8 @@ public class PurChaseListener implements Listener {
                 return;
             }
 
+            if(pl.hasMetadata("RentLand")) return;
+
             showParticle(loc1, loc2, pl);
             calculate(loc1, loc2, pl);
             Bukkit.getPluginManager().registerEvents(new PlayerChatListener(), Bukkit.getPluginManager().getPlugin("RentLand"));

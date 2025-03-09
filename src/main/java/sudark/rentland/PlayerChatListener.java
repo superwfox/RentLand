@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
@@ -15,15 +16,22 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.List;
 
-import static sudark.rentland.PurChaseListener.Tloc;
+import static sudark.rentland.PurChaseListener.*;
 
 public class PlayerChatListener implements Listener {
+    public void cancel(Player pl) {
+        Tloc.remove(pl);
+        showLand.cancel();
+        showLand2.cancel();
+    }
+
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent e) throws URISyntaxException {
         Player pl = e.getPlayer();
 
         if (!pl.hasMetadata("RentLand")) return;
 
+        e.setCancelled(true);
 
         if (pl.getMetadata("RentLand").size() == 3) {
             String[] strs = pl.getMetadata("RentLand").get(0).asString().split("//|");
@@ -41,18 +49,20 @@ public class PlayerChatListener implements Listener {
                 OneBotClient ws = new OneBotClient(new URI("ws://localhost:3001"));
                 ws.sendG(msg);
                 ws.at(DataSniffer.findQQ(pl.getUniqueId().toString()));
+                pl.removeMetadata("RentLand", Bukkit.getPluginManager().getPlugin("RentLand"));
             }
         }
 
-        int weeks = -1;
+        int weeks;
         try {
             weeks = Integer.parseInt(e.getMessage());
         } catch (NumberFormatException ex) {
-            pl.sendMessage("非阿拉伯数字 已取消");
-            pl.sendMessage("=================");
-            pl.sendMessage("你现在可以重新圈地了");
-            Tloc.remove(pl);
+            pl.sendMessage("[§e领地§f] 非阿拉伯数字 已取消");
+            pl.sendMessage("§7  你现在可以重新圈地了");
+            cancel(pl);
+            HandlerList.unregisterAll(this);
             pl.removeMetadata("RentLand", Bukkit.getPluginManager().getPlugin("RentLand"));
+            return;
         }
 
         if (weeks < 1) {
@@ -77,6 +87,9 @@ public class PlayerChatListener implements Listener {
 
         pl.setLevel(level - area / 100 * weeks);
         success(pl, area, weeks);
+
+        cancel(pl);
+        HandlerList.unregisterAll(this);
 
         List<List<String>> data = FileManager.readCSV(FileManager.landFile);
         data.add(List.of(weeks * 7 + "", "null", "" + x1, "" + X1, "" + z1, "" + Z1, pl.getUniqueId().toString()));
