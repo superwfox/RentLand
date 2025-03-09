@@ -2,3 +2,7 @@ name: RentLand
 version: '${project.version}'
 main: sudark.rentland.RentLand
 api-version: '1.21'
+commands:
+  book:
+    description: "补地产证"
+    usage: "/book"

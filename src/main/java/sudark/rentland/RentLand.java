@@ -17,6 +17,7 @@ public final class RentLand extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new BookController(), this);
         Bukkit.getPluginManager().registerEvents(new LandNotice(), this);
         Bukkit.getPluginManager().registerEvents(new PurChaseListener(), this);
+        Bukkit.getPluginCommand("book").setExecutor(this);
 
         PlayerMoveDetector.main();
 
