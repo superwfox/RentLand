@@ -1,6 +1,7 @@
 package sudark.rentland;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.net.URI;
@@ -17,7 +18,7 @@ public final class RentLand extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new BookController(), this);
         Bukkit.getPluginManager().registerEvents(new LandNotice(), this);
         Bukkit.getPluginManager().registerEvents(new PurChaseListener(), this);
-        Bukkit.getPluginCommand("book").setExecutor(this);
+        Bukkit.getPluginCommand("book").setExecutor(new CommandManager());
 
         PlayerMoveDetector.main();
 
