@@ -1,6 +1,6 @@
 # RentLand - Paper 领地管理插件
 
-##[Read in English](https://github.com/superwfox/RentLand/blob/master/README_en.markdown)
+## [【Read in English】](https://github.com/superwfox/RentLand/blob/master/README_en.markdown)
 
 RentLand 是一个专为 Minecraft Paper 服务器设计的领地管理插件，集成了领地租赁、权限管理和通知系统等功能，并通过 WebSocket 连接机器人（如基于 OneBot 协议的 QQ 机器人）实现消息通知。玩家可以通过消耗等级租赁领地、管理权限，并接收到期提醒等通知。
 
