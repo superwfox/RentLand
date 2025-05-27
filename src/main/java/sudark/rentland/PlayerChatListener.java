@@ -11,12 +11,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.List;
 
 import static sudark.rentland.PurChaseListener.*;
+import static sudark.rentland.RentLand.BotName;
 
 public class PlayerChatListener implements Listener {
     public void cancel(Player pl) {
@@ -26,31 +25,12 @@ public class PlayerChatListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerChat(AsyncPlayerChatEvent e) throws URISyntaxException {
+    public void onPlayerChat(AsyncPlayerChatEvent e) {
         Player pl = e.getPlayer();
 
         if (!pl.hasMetadata("RentLand")) return;
 
         e.setCancelled(true);
-
-        if (pl.hasMetadata("LandTip")) {
-            String[] strs = pl.getMetadata("LandTip").get(0).asString().split(",");
-
-            if (e.getMessage().equals("票据")) {
-                String msg = "RENTLAND:\n" +
-                        "==============\n" +
-                        "地主：" + pl.getName() + "\n" +
-                        "面积：" + strs[0] + "\n" +
-                        "租期：" + strs[1] + "周\n" +
-                        "==============\n" +
-                        "[" + strs[2] + "]";
-
-                OneBotClient ws = new OneBotClient(new URI("ws://localhost:3001"));
-                ws.sendG(msg);
-                ws.at(DataSniffer.findQQ(pl.getUniqueId().toString()));
-                pl.removeMetadata("LandTip", Bukkit.getPluginManager().getPlugin("RentLand"));
-            }
-        }
 
         int weeks = -1;
         try {
@@ -89,10 +69,37 @@ public class PlayerChatListener implements Listener {
 
         cancel(pl);
         HandlerList.unregisterAll(this);
+        Bukkit.getPluginManager().registerEvents(new TickPrinter(), RentLand.getPlugin(RentLand.class));
 
         List<List<String>> data = FileManager.readCSV(FileManager.landFile);
         data.add(List.of(weeks * 7 + "", "null", "" + x1, "" + X1, "" + z1, "" + Z1, pl.getUniqueId().toString()));
         FileManager.writeCSV(FileManager.landFile, data);
+    }
+
+    private class TickPrinter implements Listener {
+        @EventHandler
+        public void onPlayerChat(AsyncPlayerChatEvent e) {
+            Player pl = e.getPlayer();
+
+            if (pl.hasMetadata("LandTip")) {
+                String[] strs = pl.getMetadata("LandTip").get(0).asString().split(",");
+
+                if (e.getMessage().equals("票据")) {
+                    String msg = "RENTLAND:\n" +
+                            "==============\n" +
+                            "地主：" + pl.getName() + "\n" +
+                            "面积：" + strs[0] + "\n" +
+                            "租期：" + strs[1] + "周\n" +
+                            "==============\n" +
+                            "[" + strs[2] + "]";
+
+                    OneBotClient.sendG(msg);
+                    OneBotClient.at(DataSniffer.findQQ(pl.getUniqueId().toString()));
+                    pl.removeMetadata("LandTip", Bukkit.getPluginManager().getPlugin("RentLand"));
+                    HandlerList.unregisterAll(this);
+                }
+            }
+        }
     }
 
     public void success(Player pl, int area, int time) {
@@ -113,7 +120,7 @@ public class PlayerChatListener implements Listener {
         pl.sendMessage("§e§l" + pl.getName() + " §r§f同志，您于§b" + t + "§f租赁土地§e " + area + " §f格，租期§e " + time * 7 + " §f天");
         pl.sendMessage("§7需要在群内发送票据，请在游戏聊天发送“票据”");
 
-        pl.sendTitle("[§e租赁成功§f]", "§7QQ群与§b南国总督§7私聊发送LAND开启消息通知", 20, 100, 40);
+        pl.sendTitle("[§e租赁成功§f]", "§7QQ群与§b" + BotName + "§7私聊发送LAND开启消息通知", 20, 100, 40);
         pl.getInventory().addItem(property);
     }
 }

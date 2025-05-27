@@ -9,11 +9,10 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 public class LandNotice implements Listener {
 
@@ -23,17 +22,17 @@ public class LandNotice implements Listener {
     static BukkitTask task = null;
     static BukkitTask task2 = null;
 
-    public static void ask(Player pl) throws URISyntaxException {
+    public static void ask(Player pl) {
         String[] strs = pl.getMetadata("invader").get(0).asString().split("\\|");
         String ownerUuid = strs[0];
         String name = strs[1];
         String landID = strs[2];
 
         if (plExist(ownerUuid)) {
-            Player p = Bukkit.getPlayer(ownerUuid);
+            Player p = Bukkit.getPlayer(UUID.fromString(ownerUuid));
 
             p.sendMessage("  [§e领地§f] §7" + pl.getName() + "正在" + name + "闲逛，是否给予权限\n   .回答“§b是§7”确认，否则请忽略此消息");
-            p.setMetadata("RightManage", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), pl.getUniqueId() + "," + landID));
+            p.setMetadata("RightManage", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), pl.getUniqueId() + "|" + landID));
 
             task = new BukkitRunnable() {
                 @Override
@@ -46,7 +45,6 @@ public class LandNotice implements Listener {
             return;
         }
 
-        OneBotClient ws = new OneBotClient(new URI("ws://localhost:3001"));
         String[] msgs = {
                 "有玩家进入领地，请注意。",
                 "玩家已进入，请留意动向。",
@@ -58,12 +56,12 @@ public class LandNotice implements Listener {
         String msg = msgs[rd.nextInt(msgs.length)];
 
         pl.sendMessage("[§e领地§f] 您当前位于他人领地，发送“询问”向领地主任询求权限");
-        ws.sendP(DataSniffer.findQQ(ownerUuid), msg);
+        OneBotClient.sendP(DataSniffer.findQQ(ownerUuid), msg);
     }
 
 
     @EventHandler
-    public void onPlayerTalk(AsyncPlayerChatEvent e) throws URISyntaxException {
+    public void onPlayerTalk(AsyncPlayerChatEvent e) {
         Player pl = e.getPlayer();
 
         if ((!pl.hasMetadata("invader")) && (!pl.hasMetadata("RightManage"))) return;
@@ -72,7 +70,7 @@ public class LandNotice implements Listener {
 
             e.setCancelled(true);
             pl.sendMessage("[§e领地§f] 请等待地主回复");
-            String[] invader = pl.getMetadata("invader").get(0).asString().split(",");
+            String[] invader = pl.getMetadata("invader").get(0).asString().split("\\|");
             ask2(invader[0], pl, invader[1]);
             qqs.add(DataSniffer.findQQ(invader[0]));
             uuids.add(pl.getUniqueId().toString());
@@ -92,7 +90,7 @@ public class LandNotice implements Listener {
         if (pl.hasMetadata("RightManage") && e.getMessage().equals("是")) {
             e.setCancelled(true);
 
-            String[] strs = pl.getMetadata("RightManager").get(0).asString().split(",");
+            String[] strs = pl.getMetadata("RightManage").get(0).asString().split("\\|");
             String uuid = strs[0];
             String landID = strs[1];
             List<List<String>> data = FileManager.readCSV(sudark.rentland.FileManager.landFile);
@@ -109,8 +107,9 @@ public class LandNotice implements Listener {
                     row.add(uuid);
                     pl.removeMetadata("RightManage", Bukkit.getPluginManager().getPlugin("RentLand"));
 
-                    pl.sendMessage("[§e领地§f] 已为[ §e" + uuid + "§f ](§b" + Bukkit.getPlayer(uuid).getName() + "§f)添加权限");
-                    Bukkit.getPlayer(uuid).sendMessage("[§e领地§f] 您已获得该领地权限");
+                    pl.sendMessage("[§e领地§f] 已为[ §e" + uuid + "§f ](§b" + Bukkit.getPlayer(UUID.fromString(uuid)).getName() + "§f)添加权限");
+                    Bukkit.getPlayer(UUID.fromString(uuid)).sendMessage("[§e领地§f] 您已获得该领地权限");
+                    task.cancel();
                     break;
                 }
             }
@@ -119,9 +118,8 @@ public class LandNotice implements Listener {
         }
     }
 
-    public static void ask2(String uuid, Player pl, String name) throws URISyntaxException {
-        OneBotClient ws = new OneBotClient(new URI("ws://localhost:3001"));
-        ws.sendP(DataSniffer.findQQ(uuid), pl.getName() + "请求进入领地" + name + "，回复“允许”来同意，否则忽略这条消息");
+    public static void ask2(String uuid, Player pl, String name) {
+        OneBotClient.sendP(DataSniffer.findQQ(uuid), pl.getName() + "请求进入领地" + name + "，回复“允许”来同意，否则忽略这条消息");
     }
 
     public static boolean plExist(String uuid) {

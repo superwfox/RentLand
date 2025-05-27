@@ -46,7 +46,7 @@ public class BookController implements Listener {
                 List<List<String>> data = FileManager.readCSV(FileManager.landFile);
                 for (List<String> row : data) {
                     if ((row.get(2) + row.get(4)).equals(LandID)) {
-                        if (name.equals(row.get(1)) && time.equals(row.get(0)) && loser == null) return;
+                        if (name.equals(row.get(1)) && time.equals(row.get(0)) && loser == null) break;
 
                         if (name != null && !name.equals(row.get(1))) {
                             pl.sendMessage("§7领地名已修改为§e§l" + name);
@@ -83,6 +83,7 @@ public class BookController implements Listener {
                             row.remove(DataSniffer.findUUID(loser));
                             pl.sendMessage("§7已为§b" + loser + "§7移除§l" + row.get(1) + "§r§7的领地权限");
                             FileManager.writeCSV(FileManager.landFile, data);
+                            return;
                         }
 
                     }
@@ -115,7 +116,7 @@ public class BookController implements Listener {
     }
 
     public String findLandPlayer(String str) {
-        Pattern pattern2 = Pattern.compile("§6·([+-]?\\d+) : §0[^@]+@");
+        Pattern pattern2 = Pattern.compile("§6·\\d+ : §0([^@]+)@");
         Matcher matcher2 = pattern2.matcher(str);
         if (matcher2.find()) {
             return matcher2.group(1);
@@ -135,7 +136,6 @@ public class BookController implements Listener {
     }
 
     @EventHandler
-
     public void onPlayerInteract(PlayerInteractEvent e) {
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
             ItemMeta itemMeta = e.getPlayer().getInventory().getItemInMainHand().getItemMeta();
@@ -183,15 +183,17 @@ public class BookController implements Listener {
 
                 int turn = 0;
                 String X = "";
+
                 for (String uuid : plList) {
                     turn++;
-                    X += "\n§6·" + turn + " : §0" + DataSniffer.findName(uuid);
+                    X += "\n\n§6·" + turn + " : §0" + DataSniffer.findName(uuid);
                     if (turn == 6) {
                         bookMeta.addPage(X);
                         X = "";
                     }
                 }
 
+                if(turn %6 != 0) bookMeta.addPage(X);
             }
         }
         bookMeta.setLore(List.of("§r§e地产证"));

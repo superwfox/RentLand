@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static sudark.rentland.LandNotice.ask;
+import static sudark.rentland.RentLand.WorldName;
 
 public class PlayerMoveDetector {
 
@@ -23,6 +24,8 @@ public class PlayerMoveDetector {
                     locations.putIfAbsent(pl, pl.getLocation());
 
                     if (locations.get(pl) == pl.getLocation()) return;
+
+                    if (!pl.getLocation().getWorld().getName().equals(WorldName)) return;
 
                     try {
                         detected(pl);
@@ -53,8 +56,8 @@ public class PlayerMoveDetector {
 
                 if (pl.hasMetadata("invader")) return;
 
-                String LandID = x  + y + "";
-                pl.setMetadata("invader", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), row.get(6) + "," + row.get(1) + "," + LandID));
+                String LandID = x + y + "";
+                pl.setMetadata("invader", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), row.get(6) + "|" + row.get(1) + "|" + LandID));
                 ask(pl);
 
                 return;

@@ -14,6 +14,8 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static sudark.rentland.RentLand.WorldName;
+
 public class PurChaseListener implements Listener {
 
     static ConcurrentHashMap<Player, Pair<Location, Location>> Tloc = new ConcurrentHashMap<>();
@@ -26,7 +28,10 @@ public class PurChaseListener implements Listener {
         if (!(pl.getItemInHand().getType() == Material.WRITABLE_BOOK && e.getAction().equals(Action.LEFT_CLICK_BLOCK)))
             return;
 
-        System.out.println("Purchase");
+        if(!pl.getWorld().getName().equals(WorldName)){
+            pl.sendMessage("[§e领地§f] 当前世界暂不支持圈地");
+            return;
+        }
 
         if (!Tloc.containsKey(pl)) {
             Tloc.put(pl, Pair.of(null, null));
@@ -165,7 +170,7 @@ public class PurChaseListener implements Listener {
         int X1 = Math.max(loc1.getBlockX(), loc2.getBlockX());
         int Z1 = Math.max(loc1.getBlockZ(), loc2.getBlockZ());
 
-        if ((X1 - x1) * (Z1 - z1) < 9) {
+        if ((X1 - x1) * (Z1 - z1) < 100) {
             Tloc.remove(pl);
             pl.sendTitle("[§e圈地失败§f]", "§7圈地面积过小");
             return false;
