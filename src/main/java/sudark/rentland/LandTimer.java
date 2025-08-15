@@ -26,27 +26,36 @@ public class LandTimer {
 
     }
 
-    public static void LandDecline(){
+    public static void LandDecline() {
         List<List<String>> data = FileManager.readCSV(FileManager.landFile);
 
-        for (List<String> row : data) {
-            row.set(0, Integer.parseInt(row.get(0)) - 1 + "");
+        for (int i = data.size() - 1; i >= 0; i--) {
+            List<String> row = data.get(i);
+            int daysLeft = Integer.parseInt(row.get(0)) - 1;
+            row.set(0, String.valueOf(daysLeft));
+
             String qq = DataSniffer.findQQ(row.get(6));
             String msg;
 
-            if (row.get(0).equals("0")) {
+            if (daysLeft == 0) {
                 msg = "您的领地【" + row.get(1) + "】今天到期，请尽快续租";
                 OneBotClient.sendP(qq, msg);
-            }
-            if (row.get(0).equals("1")) {
+            } else if (daysLeft == 1) {
                 msg = "您的领地【" + row.get(1) + "】明天到期，请尽快续租";
                 OneBotClient.sendP(qq, msg);
-            }
-            if (row.get(0).equals("6")) {
+            } else if (daysLeft == 6) {
                 msg = "您的领地【" + row.get(1) + "】还有一周到期，请尽快续租";
                 OneBotClient.sendP(qq, msg);
             }
+
+            if (daysLeft < 0) {
+                msg = "您的领地【" + row.get(1) + "】已到期，请您知晓该领地已被回收，服务器不再提供任何保护和传送";
+                OneBotClient.sendP(qq, msg);
+                data.remove(i);
+            }
         }
+
         FileManager.writeCSV(FileManager.landFile, data);
     }
+
 }

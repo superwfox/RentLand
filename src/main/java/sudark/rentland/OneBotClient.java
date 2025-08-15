@@ -103,7 +103,7 @@ public class OneBotClient extends WebSocketClient {
                             int x = Integer.parseInt(row.get(2));
                             int y = Integer.parseInt(row.get(4));
 
-                            String LandID = x + y + "";
+                            String LandID = x + "," + y;
                             String landID = landIDs.get(index);
 
                             if (LandID.equals(landID)) {
@@ -115,7 +115,7 @@ public class OneBotClient extends WebSocketClient {
                                 break;
                             }
                         }
-                        FileManager.writeCSV(sudark.rentland.FileManager.landFile, data);
+                        FileManager.writeCSV(FileManager.landFile, data);
                         sendP(qq, "已为【" + uuids.get(index) + "】 添加权限，若您无法上线管理，可以将此消息发送至管理员处理");
                         Bukkit.getPlayer(UUID.fromString(uuids.get(index))).sendMessage("[§e领地§f] 您已获得该领地权限");
                         task2.cancel();

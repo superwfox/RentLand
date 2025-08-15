@@ -1,6 +1,7 @@
 package sudark.rentland;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -12,20 +13,29 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static sudark.rentland.LandNotice.ask;
 import static sudark.rentland.RentLand.WorldName;
+import static sudark.rentland.RentLand.checkData;
 
 public class PlayerMoveDetector {
 
     public static void main() {
+        ConcurrentHashMap<Player, Location> locations = new ConcurrentHashMap<>();
+
         new BukkitRunnable() {
             @Override
             public void run() {
                 for (Player pl : Bukkit.getOnlinePlayers()) {
-                    ConcurrentHashMap<Player, Location> locations = new ConcurrentHashMap<>();
                     locations.putIfAbsent(pl, pl.getLocation());
 
-                    if (locations.get(pl) == pl.getLocation()) return;
+                    if (pl.getGameMode().equals(GameMode.SPECTATOR)) continue;
+                    if (pl.getGameMode().equals(GameMode.CREATIVE)) continue;
 
-                    if (!pl.getLocation().getWorld().getName().equals(WorldName)) return;
+                    if (locations.get(pl).equals(pl.getLocation())) continue;
+
+                    if (!pl.getLocation().getWorld().getName().equals(WorldName)) {
+                        if (pl.hasMetadata("invader"))
+                            pl.removeMetadata("invader", Bukkit.getPluginManager().getPlugin("RentLand"));
+                        continue;
+                    }
 
                     try {
                         detected(pl);
@@ -39,15 +49,14 @@ public class PlayerMoveDetector {
     }
 
     public static void detected(Player pl) throws URISyntaxException {
-
-        List<List<String>> data = FileManager.readCSV(FileManager.landFile);
-        for (List<String> row : data) {
+        for (List<String> row : checkData) {
             int x = Integer.parseInt(row.get(2));
             int X = Integer.parseInt(row.get(3));
             int y = Integer.parseInt(row.get(4));
             int Y = Integer.parseInt(row.get(5));
+            Location loc = pl.getLocation();
 
-            if (pl.getLocation().getBlockX() >= x && pl.getLocation().getBlockX() <= X && pl.getLocation().getBlockZ() >= y && pl.getLocation().getBlockZ() <= Y) {
+            if (loc.getBlockX() >= x && loc.getBlockX() <= X && loc.getBlockZ() >= y && loc.getBlockZ() <= Y) {
 
                 if (row.subList(6, row.size()).contains(pl.getUniqueId().toString())) {
                     pl.removeMetadata("invader", Bukkit.getPluginManager().getPlugin("RentLand"));
@@ -56,7 +65,7 @@ public class PlayerMoveDetector {
 
                 if (pl.hasMetadata("invader")) return;
 
-                String LandID = x + y + "";
+                String LandID = x + "," + y;
                 pl.setMetadata("invader", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), row.get(6) + "|" + row.get(1) + "|" + LandID));
                 ask(pl);
 

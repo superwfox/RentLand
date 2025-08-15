@@ -55,7 +55,7 @@ public class LandNotice implements Listener {
         Random rd = new Random();
         String msg = msgs[rd.nextInt(msgs.length)];
 
-        pl.sendMessage("[§e领地§f] 您当前位于他人领地，发送“询问”向领地主任询求权限");
+        pl.sendMessage("[§e领地§f] 您当前位于他人领地，发送“询问”向领地主询求权限");
         OneBotClient.sendP(DataSniffer.findQQ(ownerUuid), msg);
     }
 
@@ -100,7 +100,7 @@ public class LandNotice implements Listener {
                 int x = Integer.parseInt(row.get(2));
                 int y = Integer.parseInt(row.get(4));
 
-                String LandID = x + y + "";
+                String LandID = x + "," + y;
 
                 if (LandID.equals(landID)) {
 

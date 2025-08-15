@@ -5,6 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 public final class RentLand extends JavaPlugin {
 
@@ -13,6 +14,8 @@ public final class RentLand extends JavaPlugin {
     public static String WorldName;
     public static String BotName;
     public static int port = 3001;
+
+    static List<List<String>> checkData = null;
 
     @Override
     public void onEnable() {
@@ -24,6 +27,8 @@ public final class RentLand extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new LandNotice(), this);
         Bukkit.getPluginManager().registerEvents(new PurChaseListener(), this);
         Bukkit.getPluginCommand("book").setExecutor(new CommandManager());
+
+        checkData = FileManager.readCSV(FileManager.landFile);
 
         PlayerMoveDetector.main();
         LandTimer.main(this);

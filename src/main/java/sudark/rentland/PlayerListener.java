@@ -1,5 +1,6 @@
 package sudark.rentland;
 
+import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,6 +27,13 @@ public class PlayerListener implements Listener {
     public void onPlayerPortal(PlayerPortalEvent e) {
         if (e.getPlayer().hasMetadata("invader")) {
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PrePlayerAttackEntityEvent event) {
+        if (event.getPlayer().hasMetadata("invader")) {
+            event.setCancelled(true);
         }
     }
 

@@ -28,7 +28,7 @@ public class PurChaseListener implements Listener {
         if (!(pl.getItemInHand().getType() == Material.WRITABLE_BOOK && e.getAction().equals(Action.LEFT_CLICK_BLOCK)))
             return;
 
-        if(!pl.getWorld().getName().equals(WorldName)){
+        if (!pl.getWorld().getName().equals(WorldName)) {
             pl.sendMessage("[§e领地§f] 当前世界暂不支持圈地");
             return;
         }
@@ -70,7 +70,7 @@ public class PurChaseListener implements Listener {
                 return;
             }
 
-            if(pl.hasMetadata("RentLand")) return;
+            if (pl.hasMetadata("RentLand")) return;
 
             showParticle(loc1, loc2, pl);
             calculate(loc1, loc2, pl);
@@ -176,18 +176,24 @@ public class PurChaseListener implements Listener {
             return false;
         }
 
-        for (List<String> row : data) {
-            int x = Integer.parseInt(row.get(2));
-            int X = Integer.parseInt(row.get(3));
-            int z = Integer.parseInt(row.get(4));
-            int Z = Integer.parseInt(row.get(5));
-
-            if (!(X < x1 || X1 < x || Z < z1 || Z1 < z)) {
-                Tloc.remove(pl);
-                pl.sendTitle("[§e圈地失败§f]", "§7包含他人领地（自己的也算他人的）");
-                return false;
-            }
+        if (Math.max(x1, z1) <= Math.min(X1, Z1)){
+            Tloc.remove(pl);
+            pl.sendTitle("[§e圈地失败§f]", "§7领地包含BOSS生成地点");
+            return false;
         }
+
+            for (List<String> row : data) {
+                int x = Integer.parseInt(row.get(2));
+                int X = Integer.parseInt(row.get(3));
+                int z = Integer.parseInt(row.get(4));
+                int Z = Integer.parseInt(row.get(5));
+
+                if (!(X < x1 || X1 < x || Z < z1 || Z1 < z)) {
+                    Tloc.remove(pl);
+                    pl.sendTitle("[§e圈地失败§f]", "§7包含他人领地（自己的也算他人的）");
+                    return false;
+                }
+            }
         return true;
     }
 }

@@ -1,5 +1,6 @@
 package sudark.rentland;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.entity.Player;
@@ -16,6 +17,11 @@ public class CommandManager implements CommandExecutor {
         if (sender instanceof Player pl) {
             if (!pl.isOp()) return false;
 
+            if (args.length == 1 || args[0].equals("return")) {
+                inLand(pl);
+                return true;
+            }
+
             ItemStack property = new ItemStack(Material.WRITABLE_BOOK);
             ItemMeta propertyMeta = property.getItemMeta();
             propertyMeta.setLore(List.of("§r§e地产证"));
@@ -24,6 +30,37 @@ public class CommandManager implements CommandExecutor {
 
         }
         return true;
+    }
+
+    public static boolean inLand(Player pl) {
+
+        List<List<String>> data = FileManager.readCSV(FileManager.landFile);
+        for (List<String> row : data) {
+            int x = Integer.parseInt(row.get(2));
+            int X = Integer.parseInt(row.get(3));
+            int y = Integer.parseInt(row.get(4));
+            int Y = Integer.parseInt(row.get(5));
+            Location loc = pl.getLocation();
+
+            if (loc.getBlockX() >= x && loc.getBlockX() <= X && loc.getBlockZ() >= y && loc.getBlockZ() <= Y) {
+
+                int t = Integer.parseInt(row.get(0));
+                int area = (X - x) * (Y - y);
+                int deltaT = t * area / 700 - 1;
+
+                String owner = DataSniffer.findQQ(row.get(6));
+                String msg = "您的领地[" + row.get(1) + "]已被停用，相关原因请咨询服主\n================\n- 领地价值 ： " + deltaT + "L";
+                OneBotClient.at(owner);
+                OneBotClient.sendG(msg);
+
+                pl.sendMessage("领地§b[" + row.get(1) + "]§f已被停用，价值为§e " + deltaT + "L§r");
+                data.remove(row);
+                FileManager.writeCSV(FileManager.landFile, data);
+                return true;
+            }
+        }
+        pl.sendMessage("§c您当前不在领地内");
+        return false;
     }
 
 }

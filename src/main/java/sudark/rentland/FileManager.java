@@ -42,7 +42,7 @@ public class FileManager {
 
         YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
         WorldName = config.getString("WorldName");
-        port = config.getInt("port");
+        port = (config.getInt("port") == 0) ? 3001 : config.getInt("port");
         QQGroup = config.getString("QQGroup");
         BotName = config.getString("botName");
 
@@ -96,6 +96,7 @@ public class FileManager {
 
     //写文件
     public static void writeCSV(File file, List<List<String>> data) {
+        checkData = data;
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
             for (List<String> row : data) {
 

@@ -16,6 +16,7 @@ import java.util.List;
 
 import static sudark.rentland.PurChaseListener.*;
 import static sudark.rentland.RentLand.BotName;
+import static sudark.rentland.RentLand.checkData;
 
 public class PlayerChatListener implements Listener {
     public void cancel(Player pl) {
