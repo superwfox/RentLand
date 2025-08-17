@@ -17,7 +17,7 @@ public class CommandManager implements CommandExecutor {
         if (sender instanceof Player pl) {
             if (!pl.isOp()) return false;
 
-            if (args.length == 1 || args[0].equals("return")) {
+            if (args.length > 0 && args[0].equals("return")) {
                 inLand(pl);
                 return true;
             }
