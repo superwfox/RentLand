@@ -1,6 +1,9 @@
 package sudark.rentland;
 
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.net.URI;
@@ -10,7 +13,7 @@ import java.util.List;
 public final class RentLand extends JavaPlugin {
 
     public static OneBotClient client;
-    public static String QQGroup ;
+    public static String QQGroup;
     public static String WorldName;
     public static String BotName;
     public static int port = 3001;
@@ -34,7 +37,7 @@ public final class RentLand extends JavaPlugin {
         LandTimer.main(this);
 
         try {
-            client = new OneBotClient(new URI("ws://127.0.0.1:"+port));
+            client = new OneBotClient(new URI("ws://127.0.0.1:" + port));
             client.connect();
         } catch (URISyntaxException var2) {
             Exception e = var2;

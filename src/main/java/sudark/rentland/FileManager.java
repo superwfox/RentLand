@@ -94,6 +94,8 @@ public class FileManager {
         return data;
     }
 
+
+
     //写文件
     public static void writeCSV(File file, List<List<String>> data) {
         checkData = data;
