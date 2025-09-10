@@ -1,9 +1,6 @@
 package sudark.rentland;
 
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Player;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.net.URI;
@@ -35,6 +32,7 @@ public final class RentLand extends JavaPlugin {
 
         PlayerMoveDetector.main();
         LandTimer.main(this);
+        DataSniffer.reloadQQMap();
 
         try {
             client = new OneBotClient(new URI("ws://127.0.0.1:" + port));

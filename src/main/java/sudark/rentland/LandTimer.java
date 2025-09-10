@@ -34,7 +34,7 @@ public class LandTimer {
             int daysLeft = Integer.parseInt(row.get(0)) - 1;
             row.set(0, String.valueOf(daysLeft));
 
-            String qq = DataSniffer.findQQ(row.get(6));
+            String qq = row.get(6);
             String msg;
 
             if (daysLeft == 0) {

@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import static sudark.rentland.DataSniffer.getPlayerByQQ;
+import static sudark.rentland.DataSniffer.getQQ;
+
 public class LandNotice implements Listener {
 
     public static List<String> qqs = new ArrayList<>();
@@ -24,15 +27,15 @@ public class LandNotice implements Listener {
 
     public static void ask(Player pl) {
         String[] strs = pl.getMetadata("invader").get(0).asString().split("\\|");
-        String ownerUuid = strs[0];
+        String qq = strs[0];
         String name = strs[1];
         String landID = strs[2];
 
-        if (plExist(ownerUuid)) {
-            Player p = Bukkit.getPlayer(UUID.fromString(ownerUuid));
+        Player p = getPlayerByQQ(qq);
 
+        if (p != null) {
             p.sendMessage("  [§e领地§f] §7" + pl.getName() + "正在" + name + "闲逛，是否给予权限\n   .回答“§b是§7”确认，否则请忽略此消息");
-            p.setMetadata("RightManage", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), pl.getUniqueId() + "|" + landID));
+            p.setMetadata("RightManage", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("RentLand"), getQQ(pl) + "|" + landID));
 
             task = new BukkitRunnable() {
                 @Override
@@ -56,7 +59,7 @@ public class LandNotice implements Listener {
         String msg = msgs[rd.nextInt(msgs.length)];
 
         pl.sendMessage("[§e领地§f] 您当前位于他人领地，发送“询问”向领地主询求权限");
-        OneBotClient.sendP(DataSniffer.findQQ(ownerUuid), msg);
+        OneBotClient.sendP(qq, msg);
     }
 
 
@@ -71,17 +74,20 @@ public class LandNotice implements Listener {
             e.setCancelled(true);
             pl.sendMessage("[§e领地§f] 请等待地主回复");
             String[] invader = pl.getMetadata("invader").get(0).asString().split("\\|");
-            ask2(invader[0], pl, invader[1]);
-            qqs.add(DataSniffer.findQQ(invader[0]));
-            uuids.add(pl.getUniqueId().toString());
-            landIDs.add(invader[0]);
+            String qq = invader[0];
+            String name = invader[1];
+            String landID = invader[2];
+            ask2(qq, pl, name);
+            qqs.add(qq);
+            uuids.add(getQQ(pl));
+            landIDs.add(landID);
 
             task2 = new BukkitRunnable() {
                 @Override
                 public void run() {
-                    qqs.remove(DataSniffer.findQQ(invader[0]));
-                    uuids.remove(pl.getUniqueId().toString());
-                    landIDs.remove(invader[0]);
+                    qqs.remove(qq);
+                    uuids.remove(getQQ(pl));
+                    landIDs.remove(landID);
                     pl.sendMessage("[§e领地§f] 地主没有对您的请求做出回复");
                 }
             }.runTaskLater(Bukkit.getPluginManager().getPlugin("RentLand"), 300);
@@ -91,7 +97,7 @@ public class LandNotice implements Listener {
             e.setCancelled(true);
 
             String[] strs = pl.getMetadata("RightManage").get(0).asString().split("\\|");
-            String uuid = strs[0];
+            String qq = strs[0];
             String landID = strs[1];
             List<List<String>> data = FileManager.readCSV(sudark.rentland.FileManager.landFile);
 
@@ -104,11 +110,14 @@ public class LandNotice implements Listener {
 
                 if (LandID.equals(landID)) {
 
-                    row.add(uuid);
+                    row.add(qq);
                     pl.removeMetadata("RightManage", Bukkit.getPluginManager().getPlugin("RentLand"));
+                    Player p = getPlayerByQQ(qq);
 
-                    pl.sendMessage("[§e领地§f] 已为[ §e" + uuid + "§f ](§b" + Bukkit.getPlayer(UUID.fromString(uuid)).getName() + "§f)添加权限");
-                    Bukkit.getPlayer(UUID.fromString(uuid)).sendMessage("[§e领地§f] 您已获得该领地权限");
+                    if (p != null) {
+                        pl.sendMessage("[§e领地§f] 已为[ §e" + qq + "§f ](§b" + p.getName() + "§f)添加权限");
+                        p.sendMessage("[§e领地§f] 您已获得该领地权限");
+                    }
                     task.cancel();
                     break;
                 }
@@ -118,12 +127,7 @@ public class LandNotice implements Listener {
         }
     }
 
-    public static void ask2(String uuid, Player pl, String name) {
-        OneBotClient.sendP(DataSniffer.findQQ(uuid), pl.getName() + "请求进入领地" + name + "，回复“允许”来同意，否则忽略这条消息");
-    }
-
-    public static boolean plExist(String uuid) {
-        return Bukkit.getOnlinePlayers().stream()
-                .anyMatch(p -> p.getUniqueId().toString().equals(uuid));
+    public static void ask2(String qq, Player pl, String name) {
+        OneBotClient.sendP(qq, pl.getName() + "请求进入领地" + name + "，回复“允许”来同意，否则忽略这条消息");
     }
 }

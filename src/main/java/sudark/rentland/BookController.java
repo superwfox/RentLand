@@ -17,6 +17,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static sudark.rentland.DataSniffer.*;
+
 public class BookController implements Listener {
 
     @EventHandler
@@ -47,16 +49,16 @@ public class BookController implements Listener {
                     List<String> row = data.get(i);
                     if (!(row.get(2) + "," + row.get(4)).equals(LandID)) continue;
 
-                    if (Objects.equals(name, row.get(1)) && Objects.equals(time, row.get(0)) && loser == null) break;
+                    if (Objects.equals(name, row.get(1)) && Objects.equals(time, row.get(0)) && loser == null) return;
 
-                    if (name != null && !name.equals(row.get(1))) {
+                    if (!name.equals(row.get(1))) {
                         pl.sendMessage("§7领地名已修改为§e§l" + name);
                         row.set(1, name);
                         FileManager.writeCSV(FileManager.landFile, data);
                         return;
                     }
 
-                    if (time != null && !time.equals(row.get(0))) {
+                    if (!time.equals(row.get(0))) {
                         int x = Integer.parseInt(row.get(2)), x1 = Integer.parseInt(row.get(3));
                         int z = Integer.parseInt(row.get(4)), z1 = Integer.parseInt(row.get(5));
                         int t = Integer.parseInt(row.get(0));
@@ -66,7 +68,7 @@ public class BookController implements Listener {
 
                         if (Integer.parseInt(time) <= 0) {
                             String msg = "您的领地【" + row.get(1) + "】已被回收，服务器不再提供任何保护和传送";
-                            OneBotClient.sendP(DataSniffer.findQQ(row.get(6)), msg);
+                            OneBotClient.sendP(row.get(6), msg);
                             pl.sendMessage("[§e领地§f] 【§b" + row.get(1) + "§f】已被回收，服务器不再提供任何保护");
                             pl.giveExpLevels(deltaT);
                             data.remove(i);
@@ -87,9 +89,9 @@ public class BookController implements Listener {
                     }
 
                     if (loser != null) {
-                        String uuid = DataSniffer.findUUID(loser);
-                        if (row.contains(uuid)) {
-                            row.remove(uuid);
+                        String qq = name2QQMap.get(loser);
+                        if (row.contains(qq)) {
+                            row.remove(qq);
                             pl.sendMessage("§7已为§b" + loser + "§7移除§l" + row.get(1) + "§r§7的领地权限");
                             FileManager.writeCSV(FileManager.landFile, data);
                         }
@@ -162,16 +164,17 @@ public class BookController implements Listener {
 
         List<List<String>> data = FileManager.readCSV(FileManager.landFile);
         for (List<String> row : data) {
-            if (row.subList(6, row.size()).contains(pl.getUniqueId().toString())) {
+            if (row.subList(6, row.size()).contains(getQQ(pl))) {
                 int x = Integer.parseInt(row.get(2));
                 int x1 = Integer.parseInt(row.get(3));
                 int z = Integer.parseInt(row.get(4));
                 int z1 = Integer.parseInt(row.get(5));
 
                 String name = row.get(1);
-                String owner = DataSniffer.findName(row.get(6));
+                String ownerQQ = row.get(6);
+                DataSniffer.reloadQQMap();
+                String ownerName = qq2NameMap.get(ownerQQ);
                 int t = Integer.parseInt(row.get(0));
-
 
                 int dx = x1 - x, dz = z1 - z;
                 int area = dx * dz;
@@ -181,20 +184,20 @@ public class BookController implements Listener {
                         "\n §0§lB§0:[§6" + x1 + "§0,§6" + z1 + "§0]§l\n\n" +
                         "  -§0面积: §0§l" + area + "\n " +
                         " -§0剩余租赁天数: §l" + t +
-                        "\n\n  =§0雇主: §l" + owner +
+                        "\n\n  =§0雇主: §l" + ownerName +
                         "\n\n§7   \"服务器土地管理部\"";
                 bookMeta.addPage(P);
 
                 if (row.size() == 7) continue;
 
-                List<String> plList = row.subList(7, row.size());
+                List<String> qqList = row.subList(7, row.size());
 
                 int turn = 0;
                 String X = "";
 
-                for (String uuid : plList) {
+                for (String qq : qqList) {
                     turn++;
-                    X += "\n\n§6·" + turn + " : §0" + DataSniffer.findName(uuid);
+                    X += "\n\n§6·" + turn + " : §0" + qq2NameMap.get(qq);
                     if (turn == 6) {
                         bookMeta.addPage(X);
                         X = "";

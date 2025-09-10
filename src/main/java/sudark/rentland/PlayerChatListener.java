@@ -14,9 +14,9 @@ import org.bukkit.metadata.FixedMetadataValue;;
 import java.time.LocalDate;
 import java.util.List;
 
+import static sudark.rentland.DataSniffer.getQQ;
 import static sudark.rentland.PurChaseListener.*;
 import static sudark.rentland.RentLand.BotName;
-import static sudark.rentland.RentLand.checkData;
 
 public class PlayerChatListener implements Listener {
     public void cancel(Player pl) {
@@ -70,10 +70,13 @@ public class PlayerChatListener implements Listener {
 
         cancel(pl);
         HandlerList.unregisterAll(this);
-        Bukkit.getPluginManager().registerEvents(new TickPrinter(), RentLand.getPlugin(RentLand.class));
+
+        TickPrinter tp = new TickPrinter();
+        Bukkit.getPluginManager().registerEvents(tp, RentLand.getPlugin(RentLand.class));
+        Bukkit.getScheduler().runTaskLater(RentLand.getPlugin(RentLand.class), () -> HandlerList.unregisterAll(tp), 6000L);
 
         List<List<String>> data = FileManager.readCSV(FileManager.landFile);
-        data.add(List.of(weeks * 7 + "", "null", "" + x1, "" + X1, "" + z1, "" + Z1, pl.getUniqueId().toString()));
+        data.add(List.of(weeks * 7 + "", "null", "" + x1, "" + X1, "" + z1, "" + Z1, getQQ(pl)));
         FileManager.writeCSV(FileManager.landFile, data);
     }
 
@@ -95,7 +98,7 @@ public class PlayerChatListener implements Listener {
                             "[" + strs[2] + "]";
 
                     OneBotClient.sendG(msg);
-                    OneBotClient.at(DataSniffer.findQQ(pl.getUniqueId().toString()));
+                    OneBotClient.at(getQQ(pl));
                     pl.removeMetadata("LandTip", Bukkit.getPluginManager().getPlugin("RentLand"));
                     HandlerList.unregisterAll(this);
                 }

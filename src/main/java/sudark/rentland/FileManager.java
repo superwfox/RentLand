@@ -15,6 +15,7 @@ public class FileManager {
     static File landFile = new File(landFolder, "land.csv");
 
     static File configFile = new File(landFolder, "config.yml");
+    static File courierFile = new File(Bukkit.getPluginManager().getPlugin("Courier").getDataFolder(), "allowlist.csv");
 
     public static boolean checkFile(File fileFolder, File file) {
 
@@ -93,8 +94,6 @@ public class FileManager {
 
         return data;
     }
-
-
 
     //写文件
     public static void writeCSV(File file, List<List<String>> data) {

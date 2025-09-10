@@ -6,51 +6,51 @@ import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static sudark.rentland.FileManager.*;
+import static sudark.rentland.RentLand.checkData;
 
 public class DataSniffer {
 
-    static String findQQ(String uuid) {
-        File file = new File(Bukkit.getPluginManager().getPlugin("Courier").getDataFolder(), "allowlist.csv");
-        List<List<String>> data = FileManager.readCSV(file);
+    static Map<String, String> qq2NameMap = new HashMap<>();
+    static Map<String, String> name2QQMap = new HashMap<>();
+    static Map<String, String> UUID2QQMap = new HashMap<>();
 
+    public static void reloadQQMap() {
+        List<List<String>> data = readCSV(courierFile);
         for (List<String> row : data) {
-            if (row.get(0).equals(uuid)) {
-                return row.get(2);
-            }
+            qq2NameMap.put(row.get(2), row.get(1));
+            name2QQMap.put(row.get(1), row.get(2));
+            UUID2QQMap.put(row.get(0), row.get(2));
         }
 
-        return null;
+        List<List<String>> dataT = readCSV(landFile);
+        if(checkData == dataT)return;
+
+        for (List<String> row : dataT) {
+            for (int i = 6; i < row.size(); i++) {
+                String uuid = row.get(i);
+                String qq = UUID2QQMap.get(uuid);
+                if (qq == null) continue;
+                row.set(i, qq); // 直接替换成 QQ
+            }
+        }
+        FileManager.writeCSV(landFile, dataT);
     }
 
-    public String getUUID(Player pl) {
-        NamespacedKey key = new NamespacedKey("PlayerSkinManager", "uuid");
+    public static String getQQ(Player pl) {
+        NamespacedKey key = new NamespacedKey("sudark", "qq");
         return pl.getPersistentDataContainer().get(key, PersistentDataType.STRING);
     }
 
-    static String findName(String qq) {
-        File file = new File(Bukkit.getPluginManager().getPlugin("Courier").getDataFolder(), "allowlist.csv");
-        List<List<String>> data = FileManager.readCSV(file);
-
-        for (List<String> row : data) {
-            if (row.get(2).equals(qq)) {
-                return row.get(1);
-            }
-        }
-
-        return null;
-    }
-
-    static String findUUID(String name) {
-        File file = new File(Bukkit.getPluginManager().getPlugin("Courier").getDataFolder(), "allowlist.csv");
-        List<List<String>> data = FileManager.readCSV(file);
-
-        for (List<String> row : data) {
-            if (row.get(1).equals(name)) {
-                return row.get(0);
-            }
+    public static Player getPlayerByQQ(String qq) {
+        for (Player pl : Bukkit.getOnlinePlayers()) {
+            if (getQQ(pl).equals(qq))
+                return pl;
         }
         return null;
     }
-
 }

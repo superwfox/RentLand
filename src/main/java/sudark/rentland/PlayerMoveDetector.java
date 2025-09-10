@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static sudark.rentland.DataSniffer.getQQ;
 import static sudark.rentland.LandNotice.ask;
 import static sudark.rentland.RentLand.WorldName;
 import static sudark.rentland.RentLand.checkData;
@@ -58,7 +59,7 @@ public class PlayerMoveDetector {
 
             if (loc.getBlockX() >= x && loc.getBlockX() <= X && loc.getBlockZ() >= y && loc.getBlockZ() <= Y) {
 
-                if (row.subList(6, row.size()).contains(pl.getUniqueId().toString())) {
+                if (row.subList(6, row.size()).contains(getQQ(pl))) {
                     pl.removeMetadata("invader", Bukkit.getPluginManager().getPlugin("RentLand"));
                     return;
                 }

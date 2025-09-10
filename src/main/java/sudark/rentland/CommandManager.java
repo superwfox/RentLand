@@ -48,7 +48,7 @@ public class CommandManager implements CommandExecutor {
                 int area = (X - x) * (Y - y);
                 int deltaT = t * area / 700 - 1;
 
-                String owner = DataSniffer.findQQ(row.get(6));
+                String owner = row.get(6);
                 String msg = "您的领地[" + row.get(1) + "]已被停用，相关原因请咨询服主\n================\n- 领地价值 ： " + deltaT + "L";
                 OneBotClient.at(owner);
                 OneBotClient.sendG(msg);
