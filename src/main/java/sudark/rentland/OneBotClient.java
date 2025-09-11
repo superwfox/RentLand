@@ -114,7 +114,9 @@ public class OneBotClient extends WebSocketClient {
                                 landIDs.remove(landID);
                                 break;
                             }
+
                         }
+
                         FileManager.writeCSV(FileManager.landFile, data);
                         sendP(qq, "已为【" + uuids.get(index) + "】 添加权限，若您无法上线管理，可以将此消息发送至管理员处理");
                         Bukkit.getPlayer(UUID.fromString(uuids.get(index))).sendMessage("[§e领地§f] 您已获得该领地权限");
@@ -123,8 +125,6 @@ public class OneBotClient extends WebSocketClient {
                 }
             }
         }
-
-
     }
 
     @Override
