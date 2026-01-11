@@ -3,6 +3,7 @@ package sudark.rentland;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import sudark.rentland.Command.BookCommand;
+import sudark.rentland.Command.CommandCompleter;
 import sudark.rentland.Command.LandMenu;
 import sudark.rentland.File.DataSniffer;
 import sudark.rentland.File.FileManager;
@@ -34,6 +35,7 @@ public final class RentLand extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PurChaseListener(), this);
         Bukkit.getPluginManager().registerEvents(new LandMenu(), this);
         Bukkit.getPluginCommand("book").setExecutor(new BookCommand());
+        Bukkit.getPluginCommand("book").setTabCompleter(new CommandCompleter());
 
         checkData = FileManager.readCSV(FileManager.landFile);
 
