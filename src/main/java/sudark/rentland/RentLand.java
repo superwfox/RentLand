@@ -2,6 +2,12 @@ package sudark.rentland;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import sudark.rentland.Command.BookCommand;
+import sudark.rentland.Command.LandMenu;
+import sudark.rentland.File.DataSniffer;
+import sudark.rentland.File.FileManager;
+import sudark.rentland.Listener.*;
+import sudark.rentland.Onebot.OneBotClient;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,7 +21,7 @@ public final class RentLand extends JavaPlugin {
     public static String BotName;
     public static int port = 3001;
 
-    static List<List<String>> checkData = null;
+    public static List<List<String>> checkData = null;
 
     @Override
     public void onEnable() {
@@ -26,7 +32,8 @@ public final class RentLand extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new BookController(), this);
         Bukkit.getPluginManager().registerEvents(new LandNotice(), this);
         Bukkit.getPluginManager().registerEvents(new PurChaseListener(), this);
-        Bukkit.getPluginCommand("book").setExecutor(new CommandManager());
+        Bukkit.getPluginManager().registerEvents(new LandMenu(), this);
+        Bukkit.getPluginCommand("book").setExecutor(new BookCommand());
 
         checkData = FileManager.readCSV(FileManager.landFile);
 
@@ -37,10 +44,8 @@ public final class RentLand extends JavaPlugin {
         try {
             client = new OneBotClient(new URI("ws://127.0.0.1:" + port));
             client.connect();
-        } catch (URISyntaxException var2) {
-            Exception e = var2;
+        } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-
     }
 }
